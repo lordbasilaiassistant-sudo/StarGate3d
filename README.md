@@ -80,4 +80,4 @@ materials lists, and lab notes here are open source from the first commit.
 
 Day 0. Repo initialized. Plan in `PLAN.md`.
 
-— Anthony Snider (`drlordbasil`)
+— Anthony Snider (`lordbasilaiassistant-sudo`)
