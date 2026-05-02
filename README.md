@@ -1,83 +1,219 @@
-# StarGate3d
+```
++==============================================================================+
+|                                                                              |
+|   S T A R G A T E   R E S E A R C H   P R O G R A M                          |
+|                                                                              |
+|   +--------------------+   +-------------------+   +-----------------------+ |
+|   | CLASSIFICATION     |   | DOCUMENT ID       |   | REVISION              | |
+|   | OPEN / PUBLIC      |   | SG3D-MAIN-001     |   | 0.2  (2026-05-01)     | |
+|   +--------------------+   +-------------------+   +-----------------------+ |
+|                                                                              |
+|   ALL DATA, METHODS, AND CODE IN THIS REPOSITORY ARE RELEASED                |
+|   FOR PUBLIC RESEARCH USE. NO COMPARTMENT. NO EMBARGO. NO PATENT WALL.       |
+|                                                                              |
+|   PROGRAM PRINCIPAL : SNIDER, A. (drlor)                                     |
+|   CHIEF OF STAFF    : VARGAS, E.                                             |
+|   ORIGIN            : VESTAL, NY · 2026-05-01                                |
+|                                                                              |
++==============================================================================+
+```
 
-Build a Stargate. For real.
+---
 
-## The Vision
+## §0  ABSTRACT
 
-A 3D simulation world that obeys real physics, where we test every credible path
-to a traversable wormhole — then find the cheapest one we can actually build.
+A 3D simulation world that obeys real physics, where every credible path to a
+traversable wormhole is tested against numerical relativity, then ranked by
+buildability so the cheapest viable analogue can be moved to a benchtop. Not a
+movie prop. Not a science-fiction tribute. An open-source research program
+whose output is either a working portal or the most accurate public record of
+exactly which wall stopped us and why.
 
-Not a movie prop. Not a science-fiction tribute. A working iris-and-puddle gate
-that a person can step through and come out somewhere else. If our current
-theories say it's impossible, then our current theories are incomplete and we
-treat that as a hypothesis to break, not a verdict to accept.
+This repository is the workshop.
 
-This repo is the workshop.
+---
 
-## Why This Isn't Crazy
+## §1  MISSION
 
-The pieces already exist in real labs. Nobody has assembled them yet.
+> Make a real, traversable Stargate. Or kill every plausible attempt and
+> publish the autopsy.
 
-- **Morris–Thorne wormholes** are valid solutions to General Relativity. They
-  need exotic matter (negative energy density) to stay open.
-- **Casimir effect** produces negative energy density. Measured. Real. Tiny.
-- **Maldacena–Milekhin–Popov (2020)** showed Casimir energy from massless
-  fermions in higher dimensions can in principle stabilize a traversable
-  wormhole.
-- **Jafferis et al. (Nature, 2022)** ran a "traversable wormhole" protocol on
-  Google's Sycamore quantum processor — a holographic dual, not a literal
-  hole, but the math is the same math.
-- **Prat-Camps, Navau, Sánchez (Sci. Reports, 2015)** built a real magnetic
-  wormhole on a benchtop with ferromagnetic shells and mu-metal. A field line
-  vanishes on one side and reappears on the other with no detectable path
-  between. ~$2k in materials.
-- **Acoustic and BEC analogue wormholes** have been demonstrated. Phonons cross
-  effective horizons in laboratory fluids.
-- **ER = EPR** says quantum entanglement and wormholes are the same object
-  viewed two ways. Entanglement is routine.
+If our current theories say it's impossible, those theories are incomplete and
+we treat that as a hypothesis to break, not a verdict to accept. We will run
+out of paths long before we run out of patience.
 
-We have negative energy. We have wormhole math. We have analogue gates that
-work in EM, sound, and BEC. The gap between these and a person-sized portal is
-huge — but it's an engineering gap on top of physics that already cleared.
+---
 
-## What This Repo Will Become
+## §2  BASIS IN PRIOR ART
 
-1. **A 3D simulator** (browser-first, Three.js + WebGPU) where you can stand
-   inside an actual Morris–Thorne metric and look around. Light bent by the
-   real wormhole equations, not faked with shaders.
-2. **A theory ledger** — every credible portal mechanism, its prediction, its
-   simulator scene, its required materials, its estimated cost, its current
-   experimental status, its kill criteria.
-3. **A buildable analogue track** — start with the magnetic wormhole, recreate
-   it, then push: bigger, multi-field, see how far the analogue can be taken
-   before it stops being analogue and starts being the thing.
-4. **A materials and cost model** — every step priced in materials a renter in
-   Vestal NY can actually buy. Mu-metal sheet, neodymium, copper, vacuum pumps,
-   not LIGO mirrors. If a path needs a billion dollars of antimatter, we log it
-   and look for the cheap version.
+The pieces already exist in real laboratories. Nobody has assembled them.
 
-## Honest About the Odds
+| #   | Result                                            | Year | Citation                                            |
+|-----|---------------------------------------------------|------|-----------------------------------------------------|
+| 2.1 | Morris–Thorne traversable wormhole geometry       | 1988 | Am. J. Phys. **56**, 395                            |
+| 2.2 | Casimir effect, measured negative energy density  | 1958/1997 | Sparnaay; Lamoreaux PRL **78**, 5             |
+| 2.3 | Dynamical Casimir radiation, superconducting cct  | 2011 | Wilson et al., arXiv:1105.4714                      |
+| 2.4 | Magnetic-field "wormhole" via metamaterials       | 2015 | Prat-Camps et al., Sci. Rep. **5**, 12488           |
+| 2.5 | Stabilized 4D traversable wormhole construction   | 2018/2020 | Maldacena, Milekhin, Popov, arXiv:1807.04726 / 2008.06618 |
+| 2.6 | Quantum-circuit "wormhole" protocol on Sycamore   | 2022 | Jafferis et al., Nature **612**, 51                 |
+| 2.7 | Status of #2.6 contested                          | 2023/25 | Kobrin–Schuster–Yao, arXiv:2302.07897              |
+| 2.8 | BEC analogue Hawking radiation                    | 2014/16/19 | Steinhauer et al., Nature Phys. **10**, 864 et seq. |
 
-Most of these paths fail. Some fail catastrophically (negative energy at human
-scale may be forbidden by the averaged null energy condition). Some succeed
-only as analogues that never become true gates.
+The gap between these and a person-sized portal is enormous. It is not,
+however, a gap of physics-not-existing. It is a gap of engineering on top of
+physics that has already cleared.
 
-That's fine. The point is to test them all in simulation, ship the
-buildable ones to the bench, and learn exactly which wall we hit and why.
-"It can't be done" with a measurement is worth more than ten thousand "I think
-it can" without one.
+---
 
-If even the simulator never produces a traversable scene, we will have built
-the most accurate wormhole physics sandbox on the public internet. That's not
-nothing.
+## §3  PROGRAM STRUCTURE
 
-## For Humanity
+Three branches, twenty departments. Full org chart at
+`departments/org_chart.md`.
 
-If a real gate is possible, it belongs to everyone. All theory, simulator code,
-materials lists, and lab notes here are open source from the first commit.
+```
+                         PRINCIPAL  ⟶  CHIEF OF STAFF
+                                 |
+        +------------------------+------------------------+
+        |                        |                        |
+   [RESEARCH]               [ENGINEERING]            [OPERATIONS]
+   R1  Theoretical GR       E1  Simulator           O1  Funding & Grants
+   R2  QFT / Exotic Matter  E2  Physics Solver      O2  Open-Source Release
+   R3  Materials            E3  Verification & CI   O3  Literature Surveillance
+   R4  Computational / GPU  E4  Bench Hardware      O4  IP / Patent Search
+   R5  Analogue Gravity                              O5  Communication
+   R6  Plasma / MHD
+   R7  Quantum Information
+   R8  Cryogenics & Vacuum
+   R9  Sensors / Instr.
+   R10 Higher-Dim / Brane
+   R11 Lab Safety / Apt Ops
+```
 
-## Status
+Eleven specialist research briefs (one per R-department) are committed to
+`docs/team_briefs/`. Each brief cites real papers (arXiv ID / DOI) and
+identifies items it cannot verify, marked `[unverified]` rather than
+laundered. **Rolled-up specs:** `docs/physics_spec.md` (what the simulator
+must compute) and `docs/materials_ledger.md` (what we buy and don't).
 
-Day 0. Repo initialized. Plan in `PLAN.md`.
+---
+
+## §4  STATUS
+
+| Ref      | Item                                              | State        | Date       |
+|----------|---------------------------------------------------|--------------|------------|
+| §4.1     | Repo initialized, public, MIT-implicit            | DONE         | 2026-05-01 |
+| §4.2     | Org chart + 11 specialist briefs                  | DONE         | 2026-05-01 |
+| §4.3     | Synthesis: physics_spec.md + materials_ledger.md  | DONE         | 2026-05-01 |
+| §4.4     | Phase 0 — Morris–Thorne geodesic integrator       | **PASS**     | 2026-05-01 |
+| §4.5     | Phase 1 — WebGPU simulator scaffold               | NOT STARTED  |    —       |
+| §4.6     | Phase 1 — Morris–Thorne lensing scene             | NOT STARTED  |    —       |
+| §4.7     | Phase 3 — Prat-Camps replica BOM finalized        | IN PROGRESS  |    —       |
+| §4.8     | Phase 3 — Bench replica fabricated                | NOT STARTED  |    —       |
+
+**Phase 0 result.** `scripts/raytrace_throat.py` integrates null geodesics
+through a Morris–Thorne metric (b₀ = 1) using the Hamiltonian formulation in
+the Reyes (R1) brief §3. Validation gates:
+
+```
+[1] max |H| residual across all rays    : 3.77e-15  (gate < 1e-8)   PASS
+[2] photon b=0.5  traverses the throat  : True                      PASS
+[3] photon b=1.5  reflects (p_l flip)   : True                      PASS
+[4] photon-sphere log-divergence Δφ→ln10 : 2.2982 vs 2.3026         PASS
+```
+
+The integrator is cleared for the Phase 1 WebGPU port and is committed as
+verification fixture #4 in the Lindqvist (R4) test plan. Plot saved at
+`out/phase0_raytrace.png`.
+
+---
+
+## §5  KILL CRITERIA
+
+A theory leaves the program when evidence ends it, not when fashion does. Each
+entry in `theories/` (forthcoming) carries an explicit kill criterion.
+
+| Class           | Kill condition                                                    |
+|-----------------|-------------------------------------------------------------------|
+| 4D classical    | Ford–Roman QI bound forces throat ≪ 10⁻¹⁷ m at our scales         |
+| MMP higher-dim  | LHC monopole search closes window on required magnetic monopoles  |
+| ER=EPR / GJW    | Independent replication of Sycamore-class result fails on N>50    |
+| Magnetic analogue| Phase-1 replica produces no measurable topology change at FE-predicted strength |
+| Plasma / Heim   | Already killed (Tajmar EmDrive falsification, Landis Heim catalog)|
+
+Many of these will fire. That's fine. Negative results published with
+measurement are worth more than a hundred unmeasured affirmatives.
+
+---
+
+## §6  HARD CONSTRAINTS
+
+The program runs from a rented apartment in Vestal NY with a six-year-old in
+the home. Budget: zero free cash. Distribution: signal-only via @THRYXAGI.
+Lab safety: Capt. Torres's brief (`docs/team_briefs/11_lab_safety_apartment_ops.md`)
+is binding — see her hard NO list.
+
+Anything that cannot run safely with Lucia in the home is deferred or moved to
+a partner laboratory. Anything that needs paid floors before profit is killed.
+Anything that requires "build an audience" or peopling does not exist in this
+program.
+
+---
+
+## §7  HOW TO READ THIS REPOSITORY
+
+```
+StarGate3d/
+├── README.md                      ← you are here
+├── PLAN.md                        ← phased roadmap
+├── departments/
+│   └── org_chart.md               ← formal company structure
+├── docs/
+│   ├── physics_spec.md            ← what the simulator must compute
+│   ├── materials_ledger.md        ← BOMs, vendors, hard NOs
+│   └── team_briefs/
+│       ├── 01_theoretical_gr.md          (Reyes,    R1)
+│       ├── 02_qft_exotic_matter.md       (Chen,     R2)
+│       ├── 03_materials_metamaterials.md (Vance,    R3)
+│       ├── 04_computational_gpu.md       (Lindqvist,R4)
+│       ├── 05_analogue_gravity.md        (Okonkwo,  R5)
+│       ├── 06_plasma_mhd.md              (Roy,      R6)
+│       ├── 07_quantum_info_eRepr.md      (Volkov,   R7)
+│       ├── 08_cryo_vacuum.md             (Holm,     R8)
+│       ├── 09_sensors_instrumentation.md (Mehta,    R9)
+│       ├── 10_higher_dim_brane.md        (Sato,     R10)
+│       └── 11_lab_safety_apartment_ops.md(Torres,   R11)
+├── scripts/
+│   └── raytrace_throat.py         ← Phase 0 sanity check (PASS)
+└── out/
+    └── phase0_raytrace.png        ← reproduces Morris–Thorne lensing
+```
+
+Outside readers, start at `README.md → PLAN.md → docs/physics_spec.md`. If
+your interest is the lab side, jump to `docs/materials_ledger.md` and brief
+03.
+
+---
+
+## §8  HUMANITY CLAUSE
+
+If a real gate is possible, it belongs to everyone. All theory, simulator
+code, materials lists, and lab notes here are open source from the first
+commit. There will be no proprietary fork. The protocol for whatever works,
+when it works, will be a single PDF with a parts list, a wiring diagram, a
+calibration script, and the expected reading at every step — small enough that
+a stranger with the same parts hits the same numbers.
+
+That is the deliverable.
+
+---
+
+```
++==============================================================================+
+| END OF DOCUMENT                                                              |
+| FILE   : README.md                                                           |
+| SHA    : (computed at commit)                                                |
+| STATUS : RELEASED — PUBLIC RESEARCH                                          |
++==============================================================================+
+```
 
 — Anthony Snider (`lordbasilaiassistant-sudo`)

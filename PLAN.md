@@ -1,135 +1,183 @@
-# Plan
+```
++==============================================================================+
+|  PROGRAM PLAN                                                                |
+|  DOC ID: SG3D-PLAN-001     REV: 0.2     DATE: 2026-05-01                     |
+|  CLASSIFICATION: OPEN / PUBLIC RESEARCH                                      |
++==============================================================================+
+```
 
-Build order: cheap test → simulator → theory ledger → buildable analogue.
-Same loop as everything else: validate before building, no teams for
-unvalidated ideas, kill on evidence.
+Phased build order. Validate before scaling. No teams for unvalidated ideas.
+Kill on evidence. Same loop applied to physics that we'd apply to anything
+else.
 
-## Phase 0 — The 20-line test (this week)
+---
 
-Before anything else, prove the simulator core works.
+## §1  PHASE 0 — SANITY CHECK   ◆ COMPLETE 2026-05-01
 
-- Pick a Morris–Thorne metric with a fixed throat radius `b0`.
-- Trace one light ray from outside the throat, through it, out the other side.
-- Plot it. Does it look like the picture in Morris & Thorne (1988)?
-- If yes → build the rest. If no → fix the integrator before adding any UI.
+`scripts/raytrace_throat.py` integrates null geodesics through Morris–Thorne
+in the Hamiltonian formulation (Reyes brief §3). All four validation gates
+pass:
 
-`scripts/raytrace_throat.py` — single file, scipy ODE, matplotlib plot. No
-WebGL, no scene graph, no engine. Just the math.
+```
+[1] |H| residual          3.77e-15  (gate < 1e-8)
+[2] b<b0 traverses        True
+[3] b>b0 reflects         True
+[4] photon-sphere log-div 2.298 → 2.303 (ln 10)
+```
 
-Kill criteria: if we can't reproduce the standard wormhole-lensing image in a
-weekend, we don't have the physics handle yet and shouldn't be building a
-3D world around it.
+Result: integrator quality is sufficient for Phase 1 GPU port. The script is
+committed as verification fixture #4 (Lindqvist R4 §6) and will run in CI.
 
-## Phase 1 — Simulator (weeks 2–6)
+> **Doctrine.** A 20-line test that proves the math handle is worth more than
+> a 20-thousand-line engine that doesn't.
 
-Goal: a browser scene where the user walks up to a wormhole mouth and looks
-through it. Light is integrated through the real metric, not faked.
+---
 
-Stack:
-- **Three.js + WebGPU** for rendering. Free hosting on GitHub Pages.
-- **Custom raymarched fragment shader** that walks geodesics in curved
-  spacetime per pixel. Reference: Riazuelo's "Voyage au coeur d'un trou noir"
-  approach, adapted from Schwarzschild to Morris–Thorne.
-- **WASM physics core** (Rust or C++) for the geodesic integrator if the
-  shader is too slow.
-- Scene 1: Morris–Thorne wormhole. Scene 2: rotating Teo wormhole. Scene 3:
-  Ellis drainhole. Scene 4: Maldacena–Milekhin–Popov stabilized throat.
+## §2  PHASE 1 — SIMULATOR  (target weeks 2–6)
 
-User can:
-- Translate/orient at the mouth.
-- Step through.
-- Toggle exotic-matter density visualization (where would it have to live, and
-  how much).
-- See the failure modes — what happens when the throat closes, when ANEC is
-  violated, when you exceed the energy budget.
+Browser scene where the user walks up to a wormhole mouth and looks through
+it. Light is integrated through the real metric per pixel, not faked with a
+shader trick.
 
-## Phase 2 — Theory ledger (parallel)
+| §    | Deliverable                                                  | Owner | Source brief |
+|------|--------------------------------------------------------------|-------|--------------|
+| 2.1  | Three.js + WebGPU scaffold, GH Pages CI                       | E1    | R4 §1        |
+| 2.2  | RK4 geodesic integrator on fragment shader (8D phase space)   | E2    | R4 §2        |
+| 2.3  | Christoffel closed-forms for Morris–Thorne / Ellis            | E2    | R1 §3        |
+| 2.4  | 1D LUT optimizer for axisymmetric metrics (~30–50× speedup)   | E2    | R4 §4        |
+| 2.5  | Scene S1 — Morris–Thorne                                      | E1    | R1 §1        |
+| 2.6  | Scene S2 — Ellis drainhole                                    | E1    | R1 §1        |
+| 2.7  | Scene S3 — Teo rotating (live integrate)                      | E1    | R1 §1        |
+| 2.8  | Scene S4 — MMP stabilized (with N_f, monopole HUD)            | E1    | R2 §2, R10 §1|
+| 2.9  | Scene S6 — Casimir cell, T_μν per-voxel field viz             | E1    | R2 §1        |
+| 2.10 | Energy-condition HUD on user worldline (NEC violation flag)   | E1    | R2 §5        |
+| 2.11 | Embedding diagram side-panel                                  | E1    | R1 §4        |
 
-`theories/` directory. One markdown file per portal mechanism. Each file:
+**Verification fixtures** (CI gates, all from R4 §6 + R1 §3):
 
-- Mechanism (1 paragraph)
-- Required ingredients (with units)
-- Simulator scene that demonstrates it
-- Lab analogue, if any
-- Materials and rough cost for tabletop version
-- Current experimental status (real citations)
-- Kill criteria (what evidence ends this line)
-- Open questions
+```
+T1  Schwarzschild deflection vs analytic           tol < 1e-3
+T2  Energy/H conservation along trajectory         drift < 1e-8
+T3  Photon-sphere radius (Morris–Thorne, l=0)      match
+T4  Müller image PSNR vs published reference       > 30 dB
+T5  Embedding-diagram visual                       reproduces Flamm horn
+```
 
-Initial entries to write:
+Anti-features (R1 §5 + R6 §4 — explicitly NOT shipping):
 
-1. `morris-thorne.md` — classical traversable wormhole
-2. `casimir-stabilized.md` — Maldacena/Milekhin/Popov route
-3. `er-epr.md` — wormhole-via-entanglement (Sycamore experiment, scaling)
-4. `magnetic-metamaterial.md` — Prat-Camps replication path (cheapest, real)
-5. `acoustic-analogue.md` — phonon-horizon experiments
-6. `bec-analogue.md` — Bose-Einstein condensate gates
-7. `optical-metamaterial.md` — Pendry-style EM cloaks → EM wormholes
-8. `alcubierre.md` — warp metric, included for completeness
-9. `krasnikov-tube.md` — alternative to wormhole topology
-10. `vacuum-engineering.md` — dynamical Casimir, squeezed vacuum
+- No FTL travel UI gimmickry — wormhole mouth-to-mouth is not faster than
+  light from the boundary observer's frame except via the throat shortcut,
+  and we will display that honestly.
+- No "Heim drive" toggle. Falsified.
+- No entrance-shimmer particle effect. The metric does the visual; we do not
+  decorate it.
+- No fake confidence bars on theory cards.
 
-Each gets a simulator scene and a cost line. After 10 are filled, rank by
-(buildable cost) × (probability of producing something traversable) and pick
-the top 1–3 to push hard.
+---
 
-## Phase 3 — Buildable analogue (after ranking)
+## §3  PHASE 2 — THEORY LEDGER  (parallel, weeks 2–8)
 
-Almost certainly the magnetic-metamaterial path first. It's the only one with
-a confirmed working benchtop demo and a published BOM under $5k.
+`theories/` directory, one markdown file per portal mechanism, each with
+required ingredients, sim scene, lab analogue, materials cost, experimental
+status (with arXiv IDs), kill criterion, open questions.
 
-Steps:
-1. Replicate Prat-Camps (2015) with cheaper materials. Validate with a
-   gauss-meter that field lines vanish on one side and reappear on the other.
-2. Scale: bigger shells, stronger source, see if you can pass an object whose
-   detection mechanism is purely magnetic (a Hall sensor on a stick) "through"
-   the gate in the sense that the sensor reads the same field as if it had
-   moved continuously when in fact it teleported the field-line topology.
-3. Probe: can the analogue be extended to other fields (electrostatic,
-   gravimetric)? Where does the math break?
-4. Document everything. This is where most projects stop being real and start
-   being claims. We post raw measurements.
+10 entries, sourced from the team briefs:
 
-Constraint: renter, no permanent installs, no >120V wall mods, no licensed
-materials, no anything that would put a child in the apartment at risk. Lucia
-is six. Heather Moore IG is unreliable. Hard limit on gauss field strength
-inside living space.
+```
+theories/
+├── morris-thorne.md                ← R1
+├── casimir-stabilized-mmp.md       ← R2 + R10
+├── er-epr-gjw.md                   ← R7
+├── magnetic-metamaterial.md        ← R3 (cheapest buildable)
+├── acoustic-analogue.md            ← R5
+├── bec-analogue.md                 ← R5
+├── optical-metamaterial.md         ← R3
+├── plasma-toroid.md                ← R6 (visual, not portal)
+├── alcubierre-warp.md              ← R1 (completeness)
+└── vacuum-engineering.md           ← R2 (DCE, squeezed states)
+```
 
-## Phase 4 — Hand-off (always)
+Ranking after the 10 are filled: `(P_traversable × ln(1 / dollar_cost))`.
 
-Everything that works gets a one-page reproducer with:
-- Parts list with current vendor links
-- Wiring/assembly diagram
-- Calibration script
-- Expected reading at each step
+---
 
-So a stranger with the same parts hits the same numbers. That's how you go
-from "Anthony built a thing in his basement" to "humanity has a gate
-prototype."
+## §4  PHASE 3 — BUILDABLE ANALOGUE  (after ranking)
 
-## Distribution & Funding (per global rules)
+Almost certainly the magnetic-metamaterial path first. R3 brief identifies a
+**Phase-1 mu-metal-only replica at $300–500** that gives a measurable B-field
+guiding effect — the right validation target for the FE solver before any
+$1k+ YBCO step.
 
-- Repo is public on GitHub from day 1. No commercial gate.
-- Documentation site on GitHub Pages (free).
-- Simulator is a static SPA on GitHub Pages or Cloudflare Pages (free).
-- If the project shows real progress, apply to: NSF unsolicited proposals,
-  Breakthrough Initiatives, FQXi grants, Emergent Ventures (Tyler Cowen),
-  Astera Institute, Nat Friedman / Patrick Collison's various funds. None
-  before there's a working simulator and at least one replicated bench
-  experiment.
-- No socials, no peopling, no podcasts. Tweet only on real signals via
-  @THRYXAGI: simulator launch, lab replication confirmed, theory killed.
+Capt. Torres's safety brief (R11) is binding. GO/NO-GO gating per R11 §7:
 
-## What This Plan Refuses To Do
+```
+   ┌────────────────────────────────────────┐
+   │  Hazard within tolerance?       (a)    │
+   │  Child safe?                    (b)    │
+   │  Reversible setup?              (c)    │
+   │  Measurable outcome?            (d)    │
+   └────────────────────────────────────────┘
+        all four → GO   any one → NO-GO
+```
 
-- Build before validating. Phase 0 first, every time.
-- Promise a working gate. The honest answer is "we don't know yet."
-- Pretend the math is settled. ANEC, quantum inequalities, and the Ford-Roman
-  bounds may forbid macroscopic traversability. We engage with that, we don't
-  hand-wave around it.
-- Burn cash on equipment before the simulator says it's worth burning.
+**Build path:**
 
-## First Action After Init
+1. **Phase-1.** Mu-metal hose + NdFeB source + Hall probe ($300–500).
+   Validate FE solver against measured field map. Kill criterion: no
+   detectable field-line guiding effect at predicted strength.
+2. **Phase-2.** Add YBCO + LN₂ outer shell ($3–5k all-in). Reproduce
+   Prat-Camps 2015 within 5%. Kill: cannot.
+3. **Phase-3.** Push beyond replication — bigger device, multi-field
+   coupling, time-varying drive. Document where the math actually breaks.
 
-`scripts/raytrace_throat.py` — the 20-line test. Reproduce Morris-Thorne
-lensing. If that plot looks right, we keep going.
+Hand-off doctrine (org_chart.md §"Hand-off Doctrine"): each build is "done"
+only when an outside reader with the same parts hits the same numbers.
+
+---
+
+## §5  PHASE 4 — DISTRIBUTION
+
+- Repo public from day 0. MIT-implicit license; explicit license file when an
+  external contributor lands.
+- Simulator hosted free on GitHub Pages.
+- Lab notes committed alongside code, raw measurements included.
+- @THRYXAGI signal posts only on real milestones: Phase 1 sim live, Phase-1
+  bench replica reading verified, theory entry killed by evidence.
+- No socials beyond signal. No podcasts. No content treadmill.
+
+After Phase 1 is live and Phase-1 bench is repeatable, **then** the funding
+queue opens: NSF unsolicited, FQXi, Breakthrough, Astera, Emergent Ventures.
+Not before.
+
+---
+
+## §6  WHAT THIS PLAN REFUSES TO DO
+
+| Anti-pattern                                            | Why it stays out |
+|---------------------------------------------------------|------------------|
+| Build before validating                                 | Loses months — Phase 0 first, every time |
+| Promise a working gate                                  | Honest answer is "we don't know yet" |
+| Hand-wave around ANEC / Ford–Roman QIs                  | Those are real walls; we engage them |
+| Spend money before something works                      | Renter, no payroll, $200/mo Claude floor |
+| Theatrical redactions over honest uncertainty           | We mark `[unverified]`, not `[REDACTED]` |
+| Spawn agent teams for unvalidated ideas                 | One agent + one script + one test first |
+
+---
+
+## §7  IMMEDIATE NEXT ACTIONS  (post-Phase 0)
+
+1. E1 / E2: scaffold the Three.js + WebGPU app and wire CI on GH Pages.
+2. E2: port `raytrace_throat.py` logic to a WGSL fragment shader, validate
+   against the same numerical fixtures.
+3. E3: add T1–T5 verification fixtures to CI; gate all merges on green.
+4. R3 + E4: finalize the Phase-1 magnetic-wormhole BOM and place orders for
+   the parts under $50/each that arrive within a week (mu-metal sheet, NdFeB
+   block, Hall sensor IC).
+5. O3: subscribe arxiv watch on `gr-qc`, `hep-th`, `cond-mat.quant-gas`,
+   `physics.optics` and feed deltas into the theory ledger weekly.
+
+```
++==============================================================================+
+| END OF PLAN                                                                  |
++==============================================================================+
+```
