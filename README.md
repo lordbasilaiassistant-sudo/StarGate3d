@@ -161,36 +161,35 @@ program.
 
 ## §7  HOW TO READ THIS REPOSITORY
 
+Full layout and "where things go" guide: `STRUCTURE.md`. Quick map:
+
 ```
 StarGate3d/
-├── README.md                      ← you are here
-├── PLAN.md                        ← phased roadmap
-├── departments/
-│   └── org_chart.md               ← formal company structure
-├── docs/
-│   ├── physics_spec.md            ← what the simulator must compute
-│   ├── materials_ledger.md        ← BOMs, vendors, hard NOs
-│   └── team_briefs/
-│       ├── 01_theoretical_gr.md          (Reyes,    R1)
-│       ├── 02_qft_exotic_matter.md       (Chen,     R2)
-│       ├── 03_materials_metamaterials.md (Vance,    R3)
-│       ├── 04_computational_gpu.md       (Lindqvist,R4)
-│       ├── 05_analogue_gravity.md        (Okonkwo,  R5)
-│       ├── 06_plasma_mhd.md              (Roy,      R6)
-│       ├── 07_quantum_info_eRepr.md      (Volkov,   R7)
-│       ├── 08_cryo_vacuum.md             (Holm,     R8)
-│       ├── 09_sensors_instrumentation.md (Mehta,    R9)
-│       ├── 10_higher_dim_brane.md        (Sato,     R10)
-│       └── 11_lab_safety_apartment_ops.md(Torres,   R11)
-├── scripts/
-│   └── raytrace_throat.py         ← Phase 0 sanity check (PASS)
-└── out/
-    └── phase0_raytrace.png        ← reproduces Morris–Thorne lensing
+├── README.md  PLAN.md  STRUCTURE.md      <- start here
+├── pyproject.toml                         pip install -e .
+├── departments/                           org chart
+├── docs/                                  specs + 11 team briefs
+├── theories/                              theory ledger (1 filled, 12 TBD)
+├── py/stargate/                           Python ground-truth core
+│   ├── metrics/        integrators/       validation/   viz/
+│   └── geodesics.py
+├── tests/                                 pytest, 7/7 green
+├── scripts/                               thin entry points
+├── lab/                                   bench notebook + BOMs
+└── out/                                   generated artifacts (plots, data)
 ```
 
-Outside readers, start at `README.md → PLAN.md → docs/physics_spec.md`. If
-your interest is the lab side, jump to `docs/materials_ledger.md` and brief
-03.
+Outside readers, start at `README.md → PLAN.md → docs/physics_spec.md`. To
+verify Phase 0:
+
+```
+pip install -e .[dev]
+pytest          # 7 passed
+py scripts/raytrace_throat.py   # all 4 gates PASS, plot at out/phase0_raytrace.png
+```
+
+If your interest is the lab side, jump to `docs/materials_ledger.md` and
+brief 03.
 
 ---
 
